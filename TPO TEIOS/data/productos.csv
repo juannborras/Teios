@@ -1,9 +1,0 @@
-tipo;id;nombre;stockActual;stockMinimo;unidad;costoPorUnidad;componentes
-Ingrediente;BACON;Panceta Ahumada;35;20;UNIDAD;0.40;
-Ingrediente;TOMATE;Tomate Fresco;80;10;UNIDAD;0.15;
-Ingrediente;CARNE;Medallon 200g;137;10;UNIDAD;1.20;
-Ingrediente;LECHUGA;Hojas Verdes;60;10;UNIDAD;0.10;
-Ingrediente;PAN;Pan Brioche;58;10;UNIDAD;0.50;
-Combo;COMBO_1;Teio´s;;;;;PAN:2|CARNE:2|QUESO:2
-Combo;COMBO_2;Cheeseburger;;;;;QUESO:2|CARNE:2|PAN:2
-Ingrediente;QUESO;Cheddar;40;20;UNIDAD;0.30;
