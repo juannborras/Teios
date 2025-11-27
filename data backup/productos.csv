@@ -1,0 +1,6 @@
+tipo;id;nombre;stockActual;stockMinimo;unidad;costoPorUnidad
+Ingrediente;QUESO;Cheddar;52;20;UNIDAD;0.30
+Ingrediente;TOMATE;Tomate Fresco;80;10;UNIDAD;0.15
+Ingrediente;CARNE;Medallon 200g;50;10;UNIDAD;1.20
+Ingrediente;LECHUGA;Hojas Verdes;60;10;UNIDAD;0.10
+Ingrediente;PAN;Pan Brioche;9;10;UNIDAD;0.50
