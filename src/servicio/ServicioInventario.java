@@ -16,14 +16,26 @@ public class ServicioInventario implements IServicioInventario {
     private final ProveedorProductoConfig proveedorConfig;
     private final IServicioPedidos svcPedidos;
 
+    //incorporacion de movimientos de stock, nueva clase
+    private final List<MovimientoStock> movimientos = new ArrayList<>();
+    //getter de acceso publico
+    public List<MovimientoStock> getMovimientos() {
+        return List.copyOf(movimientos);
+    }
+
+    //NUEVO: implementacion de promociones
+    private final IServicioPromociones svcPromociones;
+
     public ServicioInventario(IRepositorioProducto repoProductos,
                                  IRepositorioVenta repoVentas,
                                  IServicioPedidos svcPedidos,
-                                 ProveedorProductoConfig proveedorConfig) {
+                                 ProveedorProductoConfig proveedorConfig,
+                              IServicioPromociones svcPromociones) {
         this.repoProductos = Objects.requireNonNull(repoProductos);
         this.repoVentas = Objects.requireNonNull(repoVentas);
         this.svcPedidos = Objects.requireNonNull(svcPedidos);
         this.proveedorConfig = Objects.requireNonNull(proveedorConfig);
+        this.svcPromociones = Objects.requireNonNull(svcPromociones);
     }
 
     @Override
@@ -65,8 +77,13 @@ public class ServicioInventario implements IServicioInventario {
                     if (comp.producto().getStockActual() < needed)
                         throw new StockInsuficienteException(comp.producto().id(), needed, comp.producto().getStockActual());
                 }
-            } else {
-                if (p.getStockActual() < it.cantidad())
+            }
+            else {
+                //if (p.getStockActual() < it.cantidad()) <--- validacion anterior
+
+                //readecuacion para usar el metodo nuevo
+                //de esta manera ingrediente usa el stock propio y combo verifica el stock de todos los ingredientes
+                if (!p.tieneStockSuficiente(it.cantidad()))
                     throw new StockInsuficienteException(p.id(), it.cantidad(), p.getStockActual());
             }
         }
@@ -76,11 +93,21 @@ public class ServicioInventario implements IServicioInventario {
             var p = porId.get(it.productoId());
             if (p instanceof Combo combo) combo.descontarStock(it.cantidad());
             else p.descontarStock(it.cantidad());
+            //registrar movimientos de salida de stock (nueva clase)
+            movimientos.add(MovimientoStock.porVenta(p, it.cantidad()));
         }
 
+        /**
         // construir venta con precios vigentes
-        var venta = Venta.desde(items, porId::get);
-        repoVentas.guardar(venta);
+        //var venta = Venta.desde(items, porId::get); <-- version anterior sin promociones
+       // repoVentas.guardar(venta);
+        */
+        //NUEVO: construir venta con promociones aplicadas
+        var hoy = java.time.LocalDate.now();
+        var venta = Venta.desdeConPromociones(items, id -> porId.get(id),
+                (producto, cantidad) -> svcPromociones.calcularPrecioConPromocion(
+                        producto, producto.precio(), hoy));
+
 
         // persistir productos actualizados
         porId.values().forEach(repoProductos::guardar);

@@ -3,6 +3,7 @@ package modelo;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BiFunction;
 
 /**
  * Representa una venta inmutable:
@@ -92,5 +93,29 @@ public final class Venta implements IIdentificable<String> {
         return new Venta(id, fecha, lineas);
     }
 
+    //NUEVO: descuentos y promociones
+    //agregamos una sobrecarga para permitir calcular precios con promociones u otras reglas
+    //no reemplazamos el para mantener la compatibilidad con el codigo existente
 
+    public static Venta desdeConPromociones(List<ItemVenta> items,
+                                            java.util.function.Function<String, Producto> buscador,
+                                            BiFunction<Producto, Integer, BigDecimal> calculadorPrecio) {
+
+        Objects.requireNonNull(items, "items");
+        Objects.requireNonNull(buscador, "buscador");
+        Objects.requireNonNull(calculadorPrecio, "calculadorPrecio");
+
+        List<LineaVenta> lineas = new ArrayList<>();
+        for (ItemVenta it : items) {
+            Producto p = Optional.ofNullable(buscador.apply(it.productoId()))
+                    .orElseThrow(() -> new IllegalArgumentException("Producto inexistente: " + it.productoId()));
+
+            BigDecimal precioUnitario = calculadorPrecio.apply(p, it.cantidad());
+            lineas.add(new LineaVenta(p, it.cantidad(), precioUnitario));
+        }
+        String id = "V-" + System.currentTimeMillis();
+        return new Venta(id, LocalDateTime.now(), lineas);
+    }
 }
+
+

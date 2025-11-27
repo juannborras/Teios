@@ -47,6 +47,20 @@ public final class Combo extends Producto {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    //metodo agregado para verificar el stock de cada componente sin mirar el campo stock actual a mano
+    @Override
+    public boolean tieneStockSuficiente(int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("cantidad");
+
+        for (var c : componentes) {
+            int requerido = c.cantidad() * cantidad;
+            if (c.producto().getStockActual() < requerido) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void descontarStock(int cantidad) throws excepciones.StockInsuficienteException {
         // prevalidación: comprobar que cada componente tiene stock suficiente

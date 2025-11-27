@@ -12,6 +12,14 @@ public class ServicioPedidos implements IServicioPedidos {
     private final IRepositorioPedido repoPedidos;
     private final IRepositorioProveedor repoProveedores;
 
+    //realizacion de movimientos de stock
+    private final List<MovimientoStock> movimientos = new ArrayList<>();
+    public List<MovimientoStock> getMovimientos() {
+        return List.copyOf(movimientos);
+    }
+
+
+
     public ServicioPedidos(IRepositorioProducto repoProductos,
                               IRepositorioPedido repoPedidos,
                               IRepositorioProveedor repoProveedores) {
@@ -77,8 +85,11 @@ public class ServicioPedidos implements IServicioPedidos {
             var producto = entry.getKey();
             int cantidad = entry.getValue();
 
-            producto.incrementarStock(cantidad);     // o el método que uses
-            repoProductos.guardar(producto);     // persistís el nuevo stock
+            producto.incrementarStock(cantidad);     // o el metodo que uses
+            repoProductos.guardar(producto);// persistís el nuevo stock
+
+            movimientos.add(MovimientoStock.porReposicion(producto, cantidad));
+
         }
 
         // Marcar recibido y persistir SOLO la cabecera

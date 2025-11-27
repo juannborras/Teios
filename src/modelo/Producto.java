@@ -38,4 +38,11 @@ public abstract class Producto implements IIdentificable<String>, IPrecio {
         stockActual += cantidad;
     }
 
+    //Readecuacion para validar stock correctamente en los ingredientes de cada combo
+    public boolean tieneStockSuficiente(int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("cantidad");
+        return stockActual >= cantidad;
+    }
+
+
 }
